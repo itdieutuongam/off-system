@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thông báo Đi trễ / Về sớm - DTA SPACE</title>
+    <style>
+        body {background:#f4f6f9; margin:0; padding:20px; font-family:Arial,sans-serif;}
+        .container {max-width:1000px; margin:auto; background:white; padding:40px; border-radius:16px; box-shadow:0 10px 40px rgba(0,0,0,0.12);}
+        .title {font-size:28px; color:#a41017; text-align:center; text-transform:uppercase; margin-bottom:30px; border-bottom:3px solid #a41017; padding-bottom:15px;}
+        .grid {display:grid; grid-template-columns:1fr 1fr; gap:25px; margin:25px 0;}
+        .full {grid-column:1/-1;}
+        label {display:block; margin:15px 0 8px; font-weight:bold; font-size:15px;}
+        input, select, textarea {width:100%; padding:14px; border:1px solid #ccc; border-radius:8px; font-size:15px; box-sizing:border-box;}
+        input:focus, select:focus, textarea:focus {border-color:#a41017; outline:none; box-shadow:0 0 0 3px rgba(164,16,23,0.15);}
+        .submit-btn {display:block; width:100%; padding:18px; background:#a41017; color:white; border:none; border-radius:12px; font-size:20px; font-weight:bold; cursor:pointer; margin-top:40px;}
+        .submit-btn:hover {background:#8B0000;}
+        .back {text-align:center; margin-top:30px;}
+        .back a {color:#a41017; font-weight:bold; text-decoration:none;}
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1 class="title">THÔNG BÁO ĐI TRỄ / VỀ SỚM</h1>
+    <p style="text-align:center; margin-bottom:30px;">Xin chào <strong>{{ user.name }}</strong> - {{ user.department }}</p>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div style="padding:16px; background:#d4edda; color:#155724; border-left:6px solid #28a745; border-radius:8px; margin:25px 0;">
+          {% for c,m in messages %}{{ m }}<br>{% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <form method="POST">
+        <div class="grid">
+            <div>
+                <label>Họ và tên</label>
+                <input type="text" value="{{ user.name }}" disabled>
+            </div>
+            <div>
+                <label>Bộ phận</label>
+                <input type="text" value="{{ user.department }}" disabled>
+            </div>
+        </div>
+
+        <div class="grid">
+            <div>
+                <label>Ngày <span style="color:red;">*</span></label>
+                <input type="date" name="ngay" required>
+            </div>
+            <div>
+                <label>Nội dung <span style="color:red;">*</span></label>
+                <select name="noi_dung" required>
+                    <option value="">-- Chọn --</option>
+                    <option value="Đi trễ">Đi trễ</option>
+                    <option value="Về sớm">Về sớm</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="grid">
+            <div>
+                <label>Thời gian (VD: 30 phút, 1 tiếng, 8h30 → 10h)</label>
+                <input type="text" name="thoi_gian" placeholder="VD: Sáng xin đi trễ 30 phút">
+            </div>
+            <div>
+                <label>Số phút (nếu có)</label>
+                <input type="number" name="so_phut" min="0">
+            </div>
+        </div>
+
+        <div class="full">
+            <label>Lý do <span style="color:red;">*</span></label>
+            <textarea name="ly_do" rows="4" required placeholder="Mô tả chi tiết lý do..."></textarea>
+        </div>
+
+        <div class="full">
+            <label>Gửi cho Trưởng bộ phận duyệt <span style="color:red;">*</span></label>
+            <select name="approver" required>
+                <option value="">-- Chọn người duyệt --</option>
+                {% for a in approvers %}
+                <option value="{{ a }}">{{ a }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <button type="submit" class="submit-btn">GỬI THÔNG BÁO</button>
+    </form>
+
+    <div class="back">
+        <a href="{{ url_for('dashboard') }}">← Quay lại trang chủ</a>
+    </div>
+</div>
+</body>
+</html>

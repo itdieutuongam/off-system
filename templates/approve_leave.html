@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Duyệt đơn nghỉ phép #{{ req.id }}</title>
+    <style>
+        body {font-family:Arial,sans-serif;background:#f4f6f9;margin:0;padding:20px;}
+        .container {max-width:1000px;margin:auto;background:white;padding:35px;border-radius:12px;box-shadow:0 8px 35px rgba(0,0,0,0.12);}
+        h1 {color:#9c27b0;text-align:center;font-size:27px;margin-bottom:25px;text-transform:uppercase;}
+        .info-box {background:#f3e5f5;padding:20px;border-radius:10px;border-left:6px solid #9c27b0;margin:15px 0;}
+        .btn {padding:16px 40px;margin:15px;border:none;border-radius:12px;font-size:18px;font-weight:bold;cursor:pointer;min-width:220px;}
+        .btn-approve {background:#7b1fa2;color:white;}
+        .btn-reject {background:#d32f2f;color:white;}
+        .btn:hover {transform:scale(1.05);}
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>DUYỆT ĐƠN NGHỈ PHÉP #{{ req.id }}</h1>
+    <p style="text-align:center;"><strong>{{ user.name }}</strong> đang duyệt</p>
+
+    <div class="info-box">
+        <strong>Người xin nghỉ:</strong> {{ req.submitter_name }} ({{ req.department }})<br>
+        <strong>Thời gian:</strong> {{ req.ngay_bat_dau }} → {{ req.ngay_ket_thuc }} ({{ req.so_ngay }} ngày)<br>
+        <strong>Lý do:</strong> {{ req.ly_do }}
+    </div>
+
+    <form method="POST" style="text-align:center;margin-top:40px;">
+        <button type="submit" name="decision" value="approve" class="btn btn-approve">
+            DUYỆT
+        </button>
+        <button type="submit" name="decision" value="reject" class="btn btn-reject">
+            TỪ CHỐI
+        </button>
+    </form>
+
+    <p style="text-align:center; margin-top:40px;">
+        <a href="{{ url_for('dashboard') }}" style="color:#ff5722; font-weight:bold;">Quay lại trang chủ</a>
+    </p>
+        
+</div>
+</body>
+</html>

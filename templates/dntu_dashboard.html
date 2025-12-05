@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trang chủ - DTA SPACE</title>
+<style>
+    body {font-family:Arial,sans-serif;background:#f0f2f5;margin:0;padding:20px;}
+    .container {max-width:1200px;margin:auto;background:white;border-radius:16px;padding:35px;box-shadow:0 10px 30px rgba(0,0,0,0.12);}
+    h1 {color:#a41017;text-align:center;margin-bottom:30px;font-size:28px;text-transform:uppercase;}
+    .header {display:flex;justify-content:space-between;align-items:center;margin-bottom:30px;flex-wrap:wrap;}
+    .user-info {color:#333;font-size:16px;}
+    .logout {color:#d32f2f;font-weight:bold;text-decoration:none;}
+    .nav-buttons {display:flex;gap:12px;flex-wrap:wrap;margin:20px 0;}
+    .nav-btn {padding:10px 20px;border-radius:25px;color:white;font-weight:bold;text-decoration:none;}
+    .btn-late {background:#a41017;}
+    .btn-leave {background:#a41017;}
+    .btn-pwd {background:#555;}
+    .card {background:#fff;border-radius:12px;padding:25px;margin:30px 0;box-shadow:0 4px 20px rgba(0,0,0,0.08);border:1px solid #eee;}
+    h2 {color:#a41017;border-bottom:3px solid #a41017;padding-bottom:10px;font-size:22px;margin-top:0;}
+    table {width:100%;border-collapse:collapse;margin-top:15px;table-layout:fixed;}
+    th {background:#a41017;color:white;padding:14px;text-align:center;font-size:14px;}
+    td {padding:10px 8px;text-align:center;border-bottom:1px solid #eee;vertical-align:middle;word-wrap:break-word;}
+    tr:hover {background:#fdf2f4;}
+
+    /* ==================== TRẠNG THÁI ĐẸP – KÉO RỘNG BACKGROUND ==================== */
+    .status-wrapper {
+        display: block;
+        width: 100%;           /* Kéo full chiều rộng ô */
+        text-align: center;
+        padding: 6px 0;        /* Tạo chiều cao đẹp */
+        border-radius: 20px;
+        font-weight: bold;
+        font-size: 13px;
+        white-space: nowrap;   /* Bắt buộc 1 dòng */
+    }
+    .status-cho    {background:#fff3e0;color:#d84315;}
+    .status-duyet  {background:#e8f5e8;color:#1b5e20;}
+    .status-tuchoi {background:#ffebee;color:#c62828;}
+
+    .btn-small {padding:8px 16px;border-radius:6px;color:white;font-weight:bold;text-decoration:none;font-size:14px;}
+    .btn-approve {background:#2e7d32;}
+    .empty {text-align:center;color:#777;font-style:italic;padding:50px;background:#f9f9f9;border-radius:12px;}
+</style>
+</head>
+<body>
+<div class="container">
+    <h1>HỆ THỐNG ĐƠN - DTA SPACE</h1>
+
+    <div class="header">
+        <div>Xin chào <strong>{{ user.name }}</strong> ({{ user.role }} - {{ user.department }})</div>
+        <a href="{{ url_for('logout') }}" class="logout">Đăng xuất</a>
+    </div>
+
+    <div class="nav-buttons">
+        <a href="{{ url_for('late_early_form') }}" class="nav-btn btn-late">Đi trễ / Về sớm</a>
+        <a href="{{ url_for('leave_form') }}" class="nav-btn btn-leave">Nghỉ phép</a>
+    </div>
+
+    <!-- ĐƠN CHỜ DUYỆT -->
+    {% if late_pending or leave_pending %}
+        {% if late_pending %}
+        <div class="card">
+            <h2>THÔNG BÁO ĐI TRỄ/VỀ SỚM CHỜ DUYỆT ({{ late_pending|length }})</h2>
+            <table>
+                <tr><th>ID</th><th>Người gửi</th><th>Ngày</th><th>Nội dung</th><th>Lý do</th><th>Thao tác</th></tr>
+                {% for r in late_pending %}
+                <tr>
+                    <td>#{{ r.id }}</td>
+                    <td>{{ r.submitter_name }}</td>
+                    <td>{{ r.ngay }}</td>
+                    <td>{{ r.noi_dung }}</td>
+                    <td>{{ r.ly_do[:30] }}{% if r.ly_do|length > 30 %}...{% endif %}</td>
+                    <td><a href="{{ url_for('approve_late', req_id=r.id) }}" class="btn-small btn-approve">Duyệt</a></td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+        {% endif %}
+
+        {% if leave_pending %}
+        <div class="card">
+            <h2>ĐƠN NGHỈ PHÉP CHỜ DUYỆT ({{ leave_pending|length }})</h2>
+            <table>
+                <tr><th>ID</th><th>Người gửi</th><th>Từ ngày → Đến ngày</th><th>Số ngày</th><th>Lý do</th><th>Thao tác</th></tr>
+                {% for r in leave_pending %}
+                <tr>
+                    <td>#{{ r.id }}</td>
+                    <td>{{ r.submitter_name }}</td>
+                    <td>{{ r.ngay_bat_dau }} → {{ r.ngay_ket_thuc }}</td>
+                    <td>{{ r.so_ngay }}</td>
+                    <td>{{ r.ly_do[:30] }}{% if r.ly_do|length > 30 %}...{% endif %}</td>
+                    <td><a href="{{ url_for('approve_leave', req_id=r.id) }}" class="btn-small btn-approve">Duyệt</a></td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+        {% endif %}
+    {% endif %}
+
+    <!-- ĐƠN TÔI ĐÃ GỬI GẦN ĐÂY -->
+    <div class="card">
+        <h2>ĐƠN TÔI ĐÃ GỬI GẦN ĐÂY</h2>
+        {% if my_requests %}
+        <table>
+            <tr>
+                <th>ID</th>
+                <th>Loại đơn</th>
+                <th>Ngày gửi / Từ ngày</th>
+                <th>Nội dung</th>
+                <th>Trạng thái</th>
+                <th>Người duyệt cuối</th>
+            </tr>
+            {% for r in my_requests %}
+            <tr>
+                <td>#{{ r.id }}</td>
+                <td>{% if r.type == 'late' %}Đi trễ/Về sớm{% else %}Nghỉ phép{% endif %}</td>
+                <td>{{ r.ngay_gui }}</td>
+                <td>
+                    {% if r.type == 'late' %}
+                        {{ r.noi_dung }}
+                        {% if r.thoi_gian %} ({{ r.thoi_gian }}){% endif %}
+                        {% if r.so_phut|default(0) > 0 %} – {{ r.so_phut }} phút{% endif %}
+                    {% else %}
+                        {{ r.ngay_bat_dau }} → {{ r.ngay_ket_thuc }} ({{ r.so_ngay }} ngày)<br>
+                        <small style="color:#666;"><strong>Lý do:</strong> {{ r.ly_do[:60] }}{% if r.ly_do|length > 60 %}...{% endif %}</small>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if r.status == 'Đã duyệt' %}
+                        <span class="status-duyet">Đã duyệt</span>
+                    {% elif r.status == 'Từ chối' %}
+                        <span class="status-tuchoi">Từ chối</span>
+                    {% else %}
+                        <span class="status-cho">Chờ duyệt</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if r.final_approver %}
+                        <strong>{{ r.final_approver }}</strong>
+                    {% elif r.ghi_chu_tbp %}
+                        <strong style="color:#e65100;">{{ r.ghi_chu_tbp.split(' - ')[0] }}</strong>
+                    {% else %}
+                        <span style="color:#999;">—</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% else %}
+        <p class="empty">Bạn chưa gửi đơn nào.</p>
+        {% endif %}
+    </div>
+
+    <!-- BẢNG TẤT CẢ ĐƠN - CHỈ HIỆN CHO MANAGER & BOD -->
+{% if user.role in ['Manager', 'BOD'] and all_requests %}
+<div class="card" style="margin-top:40px;">
+    <h2>TẤT CẢ ĐƠN TRONG CÔNG TY ({{ all_requests|length }})</h2>
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Loại đơn</th>
+            <th>Người gửi</th>
+            <th>Bộ phận</th>
+            <th>Ngày gửi</th>
+            <th>Nội dung</th>
+            <th>Trạng thái</th>
+            <th>Người duyệt cuối</th>
+        </tr>
+        {% for r in all_requests %}
+        <tr>
+            <td>#{{ r.id }}</td>
+            <td>{% if r.type == 'late' %}Đi trễ/Về sớm{% else %}Nghỉ phép{% endif %}</td>
+            <td>{{ r.submitter_name }}</td>
+            <td>{{ r.department }}</td>
+            <td>{{ r.submit_date[:10] }}</td>
+            <td>
+                {% if r.type == 'late' %}
+                    {{ r.noi_dung }}
+                    {% if r.thoi_gian %} ({{ r.thoi_gian }}){% endif %}
+                    {% if r.so_phut|default(0) > 0 %} – {{ r.so_phut }} phút{% endif %}
+                    <br><small><strong>Lý do:</strong> {{ r.ly_do[:50] }}{% if r.ly_do and r.ly_do|length > 50 %}...{% endif %}</small>
+                {% else %}
+                    {{ r.ngay }} ({{ r.so_ngay }} ngày)<br>
+                    <small><strong>Lý do:</strong> {{ r.ly_do[:50] }}{% if r.ly_do and r.ly_do|length > 50 %}...{% endif %}</small>
+                {% endif %}
+            </td>
+            <td>
+                <span class="status-{% if r.status == 'Đã duyệt' %}duyet
+                    {% elif r.status == 'Từ chối' %}tuchoi
+                    {% else %}cho{% endif %}">
+                    {{ r.status }}
+                </span>
+            </td>
+            <td>
+                {% if r.final_approver %}
+                    <strong>{{ r.final_approver }}</strong>
+                {% elif r.ghi_chu_tbp %}
+                    <small style="color:#e65100;">→ {{ r.ghi_chu_tbp.split(' - ')[0] }}</small>
+                {% else %}—{% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+{% endif %}
+
+</div>
+</body>
+</html>
