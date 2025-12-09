@@ -106,13 +106,16 @@
                 <td>{{ r.submit_date[:16] | replace('T', ' ') if 'T' in r.submit_date else r.submit_date[:16] }}</td>
                 <td style="text-align:left;padding-left:12px;">
                     {% if r.type == 'late' %}
-                        {{ r.noi_dung }}
-                        {% if r.thoi_gian %} ({{ r.thoi_gian }}){% endif %}
+                        {% if r.noi_dung and r.noi_dung.strip() != "" %}
+                            {{ r.noi_dung }}
+                        {% else %}
+                            <em style="color:#e91e63;">Chưa chọn Đi trễ/Về sớm</em>
+                        {% endif %}
+                        {% if r.thoi_gian and r.thoi_gian.strip() %} ({{ r.thoi_gian }}){% endif %}
                         {% if r.so_phut|default(0) > 0 %} – {{ r.so_phut }} phút{% endif %}
-                        <br><span class="reason"><strong>Lý do:</strong> {{ r.ly_do or "Không ghi" }}</span>
+                        <br><span class="reason"><strong>Lý do:</strong> {{ r.ly_do|default("Không ghi")|trim }}</span>
                     {% else %}
-                        {{ r.ngay_bat_dau }} → {{ r.ngay_ket_thuc }} ({{ r.so_ngay }} ngày)
-                        <br><span class="reason"><strong>Lý do:</strong> {{ r.ly_do or "Không ghi" }}</span>
+                        <span class="reason"><strong>Lý do:</strong> {{ r.ly_do|default("Không ghi")|trim }}</span>
                     {% endif %}
                 </td>
                 <td>
@@ -166,7 +169,6 @@
                             {{ r.ly_do[:50] if r.ly_do else "Không ghi" }}{% if r.ly_do and r.ly_do|length > 50 %}...{% endif %}
                         </span>
                     {% else %}
-                        {{ r.ngay_bat_dau }} → {{ r.ngay_ket_thuc }} ({{ r.so_ngay }} ngày)
                         <br><span class="reason"><strong>Lý do:</strong> 
                             {{ r.ly_do[:50] if r.ly_do else "Không ghi" }}{% if r.ly_do and r.ly_do|length > 50 %}...{% endif %}
                         </span>
