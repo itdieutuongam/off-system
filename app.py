@@ -18,7 +18,8 @@ ALLOWED_USERS = {
     "hongtuyet@dieutuongam.com": {"name": "NGUYỄN THỊ HỒNG TUYẾT", "role": "BOD", "department": "BOD"},
 
     # ==================== PHÒNG HCNS-IT ====================
-    "it@dieutuongam.com": {"name": "TRẦN CÔNG KHÁNH", "role": "Manager", "department": "PHÒNG HCNS-IT"},
+    "it@dieutuongam.com": {"name": "TRẦN CÔNG KHÁNH", "role": "Employee", "department": "PHÒNG HCNS-IT"},
+    "haphung.dta@gmail.com": {"name": "PHÙNG THỊ THU HÀ", "role": "Employee", "department": "PHÒNG HCNS-IT"},
     "anthanh@dieutuongam.com": {"name": "NGUYỄN THỊ AN THANH", "role": "Manager", "department": "PHÒNG HCNS-IT"},
     "hcns@dieutuongam.com": {"name": "NHÂN SỰ DTA", "role": "Employee", "department": "PHÒNG HCNS-IT"},
     "yennhi@dieutuongam.com": {"name": "TRẦN NGỌC YẾN NHI", "role": "Employee", "department": "PHÒNG HCNS-IT"},
@@ -237,8 +238,6 @@ def dashboard():
                            late_pending=late_pending, leave_pending=leave_pending,
                            my_requests=my_requests, all_requests=all_requests)
 
-# ==================== CÁC ROUTE KHÁC (giữ nguyên, đã test OK) ====================
-# (late_early, leave, approve_late, approve_leave, logout – giữ nguyên như trước)
 
 @app.route("/late_early")
 @login_required
